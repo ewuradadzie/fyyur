@@ -56,7 +56,6 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 @app.route('/')
 def index():
-    print("back to index")
     recent_venues = Venue.query.order_by(db.desc(Venue.created_at)).limit(10).all()
     recent_artists = Artist.query.order_by(db.desc(Artist.created_at)).limit(10).all()
     return render_template('pages/home.html', venues=recent_venues, artists=recent_artists)
@@ -195,8 +194,21 @@ def create_venue_submission():
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    form = VenueForm()
     selected_venue = Venue.query.get(venue_id)
+    form = VenueForm()
+
+    form.name.data = selected_venue.name
+    form.genres.data =selected_venue.genres
+    form.address.data = selected_venue.address
+    form.city.data = selected_venue.city
+    form.state.data = selected_venue.state
+    form.phone.data =selected_venue.phone
+    form.website_link.data = selected_venue.website_link
+    form.facebook_link.data =selected_venue.facebook_link
+    form.seeking_talent.data = 'y' if selected_venue.seeking_talent == True else 'n'
+    form.seeking_description.data = selected_venue.seeking_description
+    form.image_link.data = selected_venue.image_link
+
     venue = {
         "id": selected_venue.id,
         "name": selected_venue.name,
@@ -247,7 +259,6 @@ def edit_venue_submission(venue_id):
 @app.route('/venues/<int:venue_id>/delete', methods=['GET'])
 def delete_venue(venue_id):
     venue = Venue.query.get(venue_id)
-    print("venue", venue)
     db.session.delete(venue)
     try:
         db.session.commit()
@@ -380,6 +391,17 @@ def edit_artist(artist_id):
     form = ArtistForm()
     selected_artist = Artist.query.get(artist_id)
 
+    form.name.data = selected_artist.name
+    form.genres.data =selected_artist.genres
+    form.city.data = selected_artist.city
+    form.state.data = selected_artist.state
+    form.phone.data =selected_artist.phone
+    form.website_link.data = selected_artist.website_link
+    form.facebook_link.data =selected_artist.facebook_link
+    form.image_link.data = selected_artist.image_link
+    form.seeking_venue.data = 'y' if selected_artist.seeking_venue == True else 'n'
+    form.seeking_description.data = selected_artist.seeking_description
+
     artist = {
         "id": selected_artist.id,
         "name": selected_artist.name,
@@ -389,9 +411,9 @@ def edit_artist(artist_id):
         "phone": selected_artist.phone,
         "website": selected_artist.website_link,
         "facebook_link": selected_artist.facebook_link,
+        "image_link": selected_artist.image_link,
         "seeking_venue": selected_artist.seeking_venue,
-        "seeking_description": selected_artist.seeking_description,
-        "image_link": selected_artist.image_link
+        "seeking_description": selected_artist.seeking_description
     }
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
