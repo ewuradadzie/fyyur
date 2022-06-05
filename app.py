@@ -2,20 +2,14 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from enum import unique
-import json
-from tracemalloc import start
-import re
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
 from forms import *
 from models import *
 
@@ -29,11 +23,9 @@ app.config.from_object('config')
 db.init_app(app)
 migrate = Migrate(app, db)
 
-
 #----------------------------------------------------------------------------#
-# Models.
+# Filters.
 #----------------------------------------------------------------------------#
-
 
 def format_datetime(value, format='medium'):
     if type(value) == str:
@@ -53,16 +45,15 @@ app.jinja_env.filters['datetime'] = format_datetime
 # Controllers.
 #----------------------------------------------------------------------------#
 
-
 @app.route('/')
 def index():
     recent_venues = Venue.query.order_by(db.desc(Venue.created_at)).limit(10).all()
     recent_artists = Artist.query.order_by(db.desc(Artist.created_at)).limit(10).all()
     return render_template('pages/home.html', venues=recent_venues, artists=recent_artists)
 
+
 #  Venues
 #  ----------------------------------------------------------------
-
 
 @app.route('/venues')
 def venues():
@@ -149,9 +140,9 @@ def show_venue(venue_id):
 
     return render_template('pages/show_venue.html', venue=data)
 
+
 #  Create Venue
 #  ----------------------------------------------------------------
-
 
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
@@ -276,7 +267,6 @@ def delete_venue(venue_id):
 #  Artists
 #  ----------------------------------------------------------------
 
-
 @app.route('/artists')
 def artists():
     data = Artist.query.all()
@@ -344,9 +334,9 @@ def show_artist(artist_id):
 
     return render_template('pages/show_artist.html', artist=data)
 
+
 #  Create Artist
 #  ----------------------------------------------------------------
-
 
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
@@ -382,9 +372,9 @@ def create_artist_submission():
         db.session.close()
     return redirect(url_for('index'))
 
+
 #  Update Artist
 #  ----------------------------------------------------------------
-
 
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
@@ -443,6 +433,7 @@ def edit_artist_submission(artist_id):
         db.session.close()
     return redirect(url_for('show_artist', artist_id=artist_id))
 
+
 #  Delete Artist
 #  ----------------------------------------------------------------
 
@@ -465,7 +456,6 @@ def delete_artist(artist_id):
 
 #  Shows
 #  ----------------------------------------------------------------
-
 
 @app.route('/shows')
 def shows():
@@ -502,7 +492,6 @@ def create_show_submission():
     db.session.add(show)
     try:
         db.session.commit()
-    # on successful db insert, flash success
         flash('Show was successfully listed!')
     except:
         flash('An error occurred. Show could not be listed.', 'error')
